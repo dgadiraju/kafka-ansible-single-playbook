@@ -1,6 +1,6 @@
 # kafka-ansible-single-playbook
 
-This is primarily to setup Kafka environment using single playbook.
+This is primarily to setup Kafka environment using single ansible playbook to setup required softwares and then configure and start services manually.
 
 # Instructions
 

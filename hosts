@@ -1,0 +1,21 @@
+[all]
+kafka00-pvt.itversity.com ansible_user=admin
+kafka01-pvt.itversity.com ansible_user=admin
+kafka02-pvt.itversity.com ansible_user=admin
+kafka03-pvt.itversity.com ansible_user=admin
+kafka04-pvt.itversity.com ansible_user=admin
+kafka05-pvt.itversity.com ansible_user=admin
+kafka06-pvt.itversity.com ansible_user=admin
+
+[gateways]
+kafka00-pvt.itversity.com ansible_user=admin
+
+[ensemble]
+kafka01-pvt.itversity.com ansible_user=admin
+kafka02-pvt.itversity.com ansible_user=admin
+kafka03-pvt.itversity.com ansible_user=admin
+
+[brokers]
+kafka04-pvt.itversity.com ansible_user=admin
+kafka05-pvt.itversity.com ansible_user=admin
+kafka06-pvt.itversity.com ansible_user=admin

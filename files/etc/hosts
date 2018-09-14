@@ -1,0 +1,10 @@
+127.0.0.1	localhost	localhost.localdomain localhost4 localhost4.localdomain4
+::1	localhost	localhost.localdomain localhost6 localhost6.localdomain6
+
+192.168.110.210  kafka00-pvt.itversity.com   kafka00-pvt
+192.168.110.211  kafka01-pvt.itversity.com   kafka01-pvt
+192.168.110.212  kafka02-pvt.itversity.com   kafka02-pvt
+192.168.110.213  kafka03-pvt.itversity.com   kafka03-pvt
+192.168.110.214  kafka04-pvt.itversity.com   kafka04-pvt
+192.168.110.215  kafka05-pvt.itversity.com   kafka05-pvt
+192.168.110.216  kafka06-pvt.itversity.com   kafka06-pvt

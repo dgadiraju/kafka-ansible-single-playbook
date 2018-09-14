@@ -3,36 +3,30 @@
   tasks:
 
 # Formatting and mounting storage
-  - name: create partitions for vdb
+  - name: create partitions for vdb and vdc
     parted:
-      device: /dev/vdb
+      device: "{{ item }}"
       number: 1
       state: present
-  - name: create partitions for vdc
-    parted:
-      device: /dev/vdc
-      number: 1
-      state: present
-  - name: format vdb
+    loop:
+      - /dev/vdb
+      - /dev/vdc
+  - name: format vdb and vdc
     filesystem:
       fstype: ext4
-      dev: /dev/vdb
-  - name: format vdc
-    filesystem:
-      fstype: ext4
-      dev: /dev/vdc
-  - name: mount vdb to /data1
+      dev: "{{ item }}"
+    loop:
+      - /dev/vdb
+      - /dev/vdc
+  - name: mount vdb to /data1 and vdc to /data2
     mount:
       fstype: ext4
-      src: /dev/vdb
-      path: /data1
+      src: "{{ item.dev }}"
+      path: "{{ item.path }}"
       state: mounted
-  - name: mount vdc to /data2
-    mount:
-      fstype: ext4
-      src: /dev/vdc
-      path: /data2
-      state: mounted
+    loop:
+      - { dev: '/dev/vdb', path: '/data1' }
+      - { dev: '/dev/vdc', path: '/data2' }
 
 # Update hosts file and install Java
   - name: copy hosts files
@@ -43,7 +37,7 @@
     yum:
       name: java-1.8.0-openjdk-devel
       state: present
- 
+
 # Setup zookeeper on zookeeper ensemble
 - hosts: ensemble
   tasks:
@@ -60,35 +54,21 @@
       mode: 0755
   - name: create softlink for zookeeper base dir
     file:
-      src: /opt/zookeeper-3.4.12 
+      src: /opt/zookeeper-3.4.12
       path: /opt/zookeeper
       state: link
       owner: zookeeper
       group: zookeeper
   - name: Create data directory
     file:
-      path: /data1/zookeeper
+      path: "{{ item }}"
       state: directory
       owner: zookeeper
       group: zookeeper
       mode: 0755
-  - name: Create Zookeeper log directory
-    file:
-      path: /var/log/zookeeper
-      state: directory
-      owner: zookeeper
-      group: zookeeper
-      mode: 0755 
-  - name: copy zookeeper config files
-    synchronize:
-      src: /home/training/kafka-ansible/single-playbook/files/opt/zookeeper/conf
-      dest: /opt/zookeeper
-  - name: change permissions on zookeeper config files
-    file:
-      path: /opt/zookeeper/conf
-      recurse: yes
-      owner: zookeeper
-      group: zookeeper
+    loop:
+      - /data1/zookeeper
+      - /var/log/zookeeper
 
 # Setup kafka brokers
 - hosts: brokers
@@ -96,18 +76,6 @@
   - name: Add user kafka
     user:
       name: kafka
-  - name: create directory for kafka data with owner as kafka
-    file:
-      path: /data1/kafka-logs
-      owner: kafka
-      group: kafka
-      state: directory
-  - name: create directory for kafka data with owner as kafka
-    file:
-      path: /data2/kafka-logs
-      owner: kafka
-      group: kafka
-      state: directory
   - name: Download Kafka Tar
     unarchive:
       src: http://www-us.apache.org/dist/kafka/2.0.0/kafka_2.11-2.0.0.tgz
@@ -123,42 +91,13 @@
       state: link
       owner: kafka
       group: kafka
-  - name: Create Kafka log directory
+  - name: create directories for kafka data with owner as kafka
     file:
-      path: /var/log/kafka
+      path: "{{ item }}"
+      owner: kafka
+      group: kafka
       state: directory
-      owner: kafka
-      group: kafka
       mode: 0755
-  - name: copy server.properties
-    synchronize:
-      src: /home/training/kafka-ansible/single-playbook/files/opt/kafka/config
-      dest: /opt/kafka
-  - name: change permissions on kafka config files
-    file:
-      path: /opt/kafka/config
-      recurse: yes
-      owner: kafka
-      group: kafka
-
-# Setup kafka client node
-- hosts: gateways
-  tasks:
-  - name: Add user kafka
-    user:
-      name: kafka
-  - name: Download Kafka Tar
-    unarchive:
-      src: http://www-us.apache.org/dist/kafka/2.0.0/kafka_2.11-2.0.0.tgz
-      dest: /opt
-      remote_src: yes
-      owner: kafka
-      group: kafka
-      mode: 0755
-  - name: create softlink for kafka base dir
-    file:
-      src: /opt/kafka_2.11-2.0.0
-      path: /opt/kafka
-      state: link
-      owner: kafka
-      group: kafka
+    loop:
+      - /data1/kafka-logs
+      - /data2/kafka-logs

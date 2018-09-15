@@ -1,0 +1,35 @@
+# Setup zookeeper on zookeeper ensemble
+- hosts: ensemble
+  tasks:
+  - name: Add user zookeeper
+    user:
+      name: zookeeper
+  - name: Download and Unarchive Zookeeper
+    unarchive:
+      src: http://www-us.apache.org/dist/zookeeper/zookeeper-3.4.12/zookeeper-3.4.12.tar.gz
+      dest: /opt
+      remote_src: yes
+      owner: zookeeper
+      group: zookeeper
+      mode: 0755
+  - name: create softlink for zookeeper base dir
+    file:
+      src: /opt/zookeeper-3.4.12
+      path: /opt/zookeeper
+      state: link
+      owner: zookeeper
+      group: zookeeper
+  - name: copy zoo.cfg and log4j.properties
+    synchronize:
+      src: /home/training/kafka-ansible/single-playbook/files/opt/zookeeper/conf
+      dest: /opt/zookeeper
+  - name: Create data directory
+    file:
+      path: "{{ item }}"
+      state: directory
+      owner: zookeeper
+      group: zookeeper
+      mode: 0755
+    loop:
+      - /data1/zookeeper
+      - /var/log/zookeeper

@@ -1,0 +1,35 @@
+# Setup kafka brokers
+- hosts: brokers
+  tasks:
+  - name: Add user kafka
+    user:
+      name: kafka
+  - name: Download Kafka Tar
+    unarchive:
+      src: http://www-us.apache.org/dist/kafka/2.0.0/kafka_2.11-2.0.0.tgz
+      dest: /opt
+      remote_src: yes
+      owner: kafka
+      group: kafka
+      mode: 0755
+  - name: create softlink for kafka base dir
+    file:
+      src: /opt/kafka_2.11-2.0.0
+      path: /opt/kafka
+      state: link
+      owner: kafka
+      group: kafka
+  - name: copy server.properties
+    synchronize:
+      src: /home/training/kafka-ansible/single-playbook/files/opt/kafka/config
+      dest: /opt/kafka
+  - name: create directories for kafka data with owner as kafka
+    file:
+      path: "{{ item }}"
+      owner: kafka
+      group: kafka
+      state: directory
+      mode: 0755
+    loop:
+      - /data1/kafka-logs
+      - /data2/kafka-logs

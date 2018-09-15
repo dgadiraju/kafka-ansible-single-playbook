@@ -1,7 +1,5 @@
 ---
 - hosts: all
-  vars:
-    BASE_DIRECTORY: /home/training/kafka-ansible/single-playbook
   tasks:
 
 # Formatting and mounting storage
@@ -33,7 +31,7 @@
 # Update hosts file and install Java
   - name: copy hosts files
     synchronize:
-      src: "{{ BASE_DIRECTORY }}/files/etc/hosts"
+      src: "{{ base_dir }}/files/etc/hosts"
       dest: /etc
   - name: ensure jdk 1.8
     yum:
@@ -63,6 +61,10 @@
       state: link
       owner: zookeeper
       group: zookeeper
+  - name: copy zoo.cfg and log4j.properties
+    synchronize:
+      src: "{{ base_dir }}/files/opt/zookeeper/conf"
+      dest: /opt/zookeeper
   - name: Create data directory
     file:
       path: "{{ item }}"
@@ -98,6 +100,10 @@
       state: link
       owner: kafka
       group: kafka
+  - name: copy server.properties
+    synchronize:
+      src: "{{ base_dir }}/files/opt/kafka/config"
+      dest: /opt/kafka
   - name: create directories for kafka data with owner as kafka
     file:
       path: "{{ item }}"

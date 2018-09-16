@@ -1,5 +1,6 @@
 ---
 - hosts: all
+  tags: ['common', 'install']
   tasks:
 
 # Formatting and mounting storage
@@ -31,7 +32,7 @@
 # Update hosts file and install Java
   - name: copy hosts files
     synchronize:
-      src: /home/training/kafka-ansible/single-playbook/files/etc/hosts
+      src: "{{ base_dir }}/files/etc/hosts"
       dest: /etc
   - name: ensure jdk 1.8
     yum:
@@ -40,13 +41,16 @@
 
 # Setup zookeeper on zookeeper ensemble
 - hosts: ensemble
+  vars:
+    ZOOKEEPER_VERSION: 3.4.12
+  tags: ['ensemble', 'install', 'zoo_upgrade'] 
   tasks:
   - name: Add user zookeeper
     user:
       name: zookeeper
   - name: Download and Unarchive Zookeeper
     unarchive:
-      src: http://www-us.apache.org/dist/zookeeper/zookeeper-3.4.12/zookeeper-3.4.12.tar.gz
+      src: http://www-us.apache.org/dist/zookeeper/zookeeper-{{ ZOOKEEPER_VERSION }}/zookeeper-{{ ZOOKEEPER_VERSION }}.tar.gz
       dest: /opt
       remote_src: yes
       owner: zookeeper
@@ -54,14 +58,14 @@
       mode: 0755
   - name: create softlink for zookeeper base dir
     file:
-      src: /opt/zookeeper-3.4.12
+      src: /opt/zookeeper-{{ ZOOKEEPER_VERSION }}
       path: /opt/zookeeper
       state: link
       owner: zookeeper
       group: zookeeper
   - name: copy zoo.cfg and log4j.properties
     synchronize:
-      src: /home/training/kafka-ansible/single-playbook/files/opt/zookeeper/conf
+      src: "{{ base_dir }}/files/opt/zookeeper/conf"
       dest: /opt/zookeeper
   - name: Create data directory
     file:
@@ -76,13 +80,17 @@
 
 # Setup kafka brokers
 - hosts: brokers
+  vars:
+    SCALA_VERSION: 2.11
+    KAFKA_VERSION: 2.0.0
+  tags: ['kafka', 'install', 'kafka_upgrade']
   tasks:
   - name: Add user kafka
     user:
       name: kafka
   - name: Download Kafka Tar
     unarchive:
-      src: http://www-us.apache.org/dist/kafka/2.0.0/kafka_2.11-2.0.0.tgz
+      src: http://www-us.apache.org/dist/kafka/{{ KAFKA_VERSION }}/kafka_{{ SCALA_VERSION }}-{{ KAFKA_VERSION }}.tgz
       dest: /opt
       remote_src: yes
       owner: kafka
@@ -90,14 +98,14 @@
       mode: 0755
   - name: create softlink for kafka base dir
     file:
-      src: /opt/kafka_2.11-2.0.0
+      src: /opt/kafka_{{ SCALA_VERSION }}-{{ KAFKA_VERSION }}
       path: /opt/kafka
       state: link
       owner: kafka
       group: kafka
   - name: copy server.properties
     synchronize:
-      src: /home/training/kafka-ansible/single-playbook/files/opt/kafka/config
+      src: "{{ base_dir }}/files/opt/kafka/config"
       dest: /opt/kafka
   - name: create directories for kafka data with owner as kafka
     file:
@@ -112,13 +120,17 @@
 
 # Setup kafka client
 - hosts: gateways
+  vars:
+    SCALA_VERSION: 2.11
+    KAFKA_VERSION: 2.0.0
+  tags: ['kafka', 'install', 'kafka_upgrade']
   tasks:
   - name: Add user kafka
     user:
       name: kafka
   - name: Download Kafka Tar
     unarchive:
-      src: http://www-us.apache.org/dist/kafka/2.0.0/kafka_2.11-2.0.0.tgz
+      src: http://www-us.apache.org/dist/kafka/{{ KAFKA_VERSION }}/kafka_{{ SCALA_VERSION }}-{{ KAFKA_VERSION }}.tgz
       dest: /opt
       remote_src: yes
       owner: kafka
@@ -126,7 +138,7 @@
       mode: 0755
   - name: create softlink for kafka base dir
     file:
-      src: /opt/kafka_2.11-2.0.0
+      src: /opt/kafka_{{ SCALA_VERSION }}-{{ KAFKA_VERSION }}
       path: /opt/kafka
       state: link
       owner: kafka

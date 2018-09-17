@@ -21,6 +21,6 @@ ansible ensemble \
 ansible brokers \
   -i hosts \
   -m script \
-  -a "/home/training/kafka-ansible/single-playbook/scripts/kafka-service.sh" \
+  -a "/home/training/kafka-ansible/single-playbook/scripts/kafka-start.sh" \
   --become-user kafka \
   --become

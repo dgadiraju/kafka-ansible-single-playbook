@@ -67,6 +67,13 @@
     synchronize:
       src: "{{ base_dir }}/files/opt/zookeeper/conf"
       dest: /opt/zookeeper
+  - name: change permissions on /opt/kafka/config
+    file:
+      path: /opt/zookeeper/conf
+      recurse: yes
+      owner: zookeeper
+      group: zookeeper
+      mode: 0755
   - name: Create data directory
     file:
       path: "{{ item }}"
@@ -107,6 +114,13 @@
     synchronize:
       src: "{{ base_dir }}/files/opt/kafka/config"
       dest: /opt/kafka
+  - name: change permissions on /opt/kafka/config
+    file:
+      path: /opt/kafka/config
+      recurse: yes
+      owner: kafka
+      group: kafka
+      mode: 0755
   - name: create directories for kafka data with owner as kafka
     file:
       path: "{{ item }}"
